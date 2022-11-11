@@ -6,6 +6,8 @@ import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.srosales.test.springboot.app.models.Banco;
+import org.srosales.test.springboot.app.models.Cuenta;
 import org.srosales.test.springboot.app.repositories.BancoRepository;
 import org.srosales.test.springboot.app.repositories.CuentaRepository;
 import org.srosales.test.springboot.app.services.CuentaService;
@@ -45,6 +47,13 @@ class SpringbootTestApplicationTests {
 		saldoDestino= service.revisarSaldo(2L);
 		assertEquals("900", saldoOrigen.toPlainString());
 		assertEquals("2100", saldoDestino.toPlainString());
+		int total = service.revisarTotalTransferencias(1L);
+		assertEquals(1, total);
+		verify(cuentaRepository, times(3)).findById(1L);
+		verify(cuentaRepository, times(3)).findById(2L);
+		verify(cuentaRepository, times(2)).update(any(Cuenta.class));
+		verify(bancoRepository, times(2)).findById(1L);
+		verify(bancoRepository).update(any(Banco.class));
 	}
 
 }
