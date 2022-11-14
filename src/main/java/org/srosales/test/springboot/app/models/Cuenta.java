@@ -44,15 +44,15 @@ public class Cuenta {
     }
 
     public void debito(BigDecimal monto) {
-        this.saldo = this.saldo.subtract(monto);
-    }
-
-    public void credito(BigDecimal monto) {
-        BigDecimal nuevoSaldo = this.saldo.add(monto);
+        BigDecimal nuevoSaldo = this.saldo.subtract(monto);
         if (nuevoSaldo.compareTo(BigDecimal.ZERO) < 0) {
             throw new DineroInsuficienteException("Saldo insuficiente en la cuenta");
         }
         this.saldo = nuevoSaldo;
+    }
+
+    public void credito(BigDecimal monto) {
+        this.saldo = saldo.add(monto);
     }
 
     @Override
