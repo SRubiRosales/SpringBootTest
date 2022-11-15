@@ -1,5 +1,6 @@
 package org.srosales.test.springboot.app.services;
 
+import org.springframework.stereotype.Service;
 import org.srosales.test.springboot.app.models.Banco;
 import org.srosales.test.springboot.app.models.Cuenta;
 import org.srosales.test.springboot.app.repositories.BancoRepository;
@@ -7,6 +8,7 @@ import org.srosales.test.springboot.app.repositories.CuentaRepository;
 
 import java.math.BigDecimal;
 
+@Service
 public class CuentaServiceImpl implements CuentaService {
     private CuentaRepository cuentaRepository;
     private BancoRepository bancoRepository;
