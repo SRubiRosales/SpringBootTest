@@ -5,29 +5,30 @@ import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.srosales.test.springboot.app.exceptions.DineroInsuficienteException;
 import org.srosales.test.springboot.app.models.Banco;
 import org.srosales.test.springboot.app.models.Cuenta;
 import org.srosales.test.springboot.app.repositories.BancoRepository;
 import org.srosales.test.springboot.app.repositories.CuentaRepository;
-import org.srosales.test.springboot.app.services.CuentaService;
 import org.srosales.test.springboot.app.services.CuentaServiceImpl;
 
 import java.math.BigDecimal;
 
 @SpringBootTest
 class SpringbootTestApplicationTests {
+	@Mock
 	CuentaRepository cuentaRepository;
+	@Mock
 	BancoRepository bancoRepository;
 
-	CuentaService service;
+	@InjectMocks
+	CuentaServiceImpl service;
 
 	@BeforeEach
 	void setUp() {
-		cuentaRepository = mock(CuentaRepository.class);
-		bancoRepository = mock(BancoRepository.class);
-		service = new CuentaServiceImpl(cuentaRepository, bancoRepository);
 	}
 
 	@Test
