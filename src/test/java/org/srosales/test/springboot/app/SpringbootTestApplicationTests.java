@@ -1,7 +1,6 @@
 package org.srosales.test.springboot.app;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -56,6 +55,9 @@ class SpringbootTestApplicationTests {
 		verify(cuentaRepository, times(2)).update(any(Cuenta.class));
 		verify(bancoRepository, times(2)).findById(1L);
 		verify(bancoRepository).update(any(Banco.class));
+
+		verify(cuentaRepository, times(6)).findById(anyLong());
+		verify(cuentaRepository, never()).findAll();
 	}
 
 	@Test
@@ -83,5 +85,22 @@ class SpringbootTestApplicationTests {
 		verify(cuentaRepository, never()).update(any(Cuenta.class));
 		verify(bancoRepository, times(1)).findById(1L);
 		verify(bancoRepository, never()).update(any(Banco.class));
+
+		verify(cuentaRepository, times(5)).findById(anyLong());
+		verify(cuentaRepository, never()).findAll();
+	}
+
+	@Test
+	void contextLoads3() {
+		when(cuentaRepository.findById(1L)).thenReturn(Datos.crearCuenta001());
+
+		Cuenta cuenta1 = service.findById(1L);
+		Cuenta cuenta2 = service.findById(1L);
+		assertSame(cuenta1, cuenta2);
+		assertTrue(cuenta1 == cuenta2);
+		assertEquals("Sharon", cuenta1.getPersona());
+		assertEquals("Sharon", cuenta2.getPersona());
+
+		verify(cuentaRepository, times(2)).findById(1L);
 	}
 }
