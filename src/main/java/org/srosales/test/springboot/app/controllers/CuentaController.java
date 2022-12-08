@@ -32,9 +32,9 @@ public class CuentaController {
     }
 
     @PostMapping
-    @ResponseStatus(OK)
+    @ResponseStatus(CREATED)
     public Cuenta guardar(@RequestBody Cuenta cuenta) {
-        return null;
+        return cuentaService.save(cuenta);
     }
 
     @PostMapping("/transferir")
