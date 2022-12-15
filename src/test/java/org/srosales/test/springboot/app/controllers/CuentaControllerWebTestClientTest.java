@@ -83,7 +83,8 @@ class CuentaControllerWebTestClientTest {
 
     @Test
     @Order(2)
-    void testDetalle() {
+    void testDetalle() throws JsonProcessingException {
+        Cuenta cuenta = new Cuenta(1L, "Sharon", new BigDecimal("900"));
         // When
         client.get().uri("/api/cuentas/1").exchange()
         // Then
@@ -91,7 +92,8 @@ class CuentaControllerWebTestClientTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.persona").isEqualTo("Sharon")
-                .jsonPath("$.saldo").isEqualTo(900);
+                .jsonPath("$.saldo").isEqualTo(900)
+                .json(objectMapper.writeValueAsString(cuenta));
     }
 
     @Test
