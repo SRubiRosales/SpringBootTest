@@ -3,8 +3,7 @@ package org.srosales.test.springboot.app.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -22,6 +21,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class CuentaControllerWebTestClientTest {
 
@@ -36,6 +36,7 @@ class CuentaControllerWebTestClientTest {
     }
 
     @Test
+    @Order(1)
     void testTransferir() throws JsonProcessingException {
         // Given
         TransaccionDto dto = new TransaccionDto();
@@ -81,6 +82,7 @@ class CuentaControllerWebTestClientTest {
     }
 
     @Test
+    @Order(2)
     void testDetalle() {
         // When
         client.get().uri("/api/cuentas/1").exchange()
@@ -89,10 +91,11 @@ class CuentaControllerWebTestClientTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.persona").isEqualTo("Sharon")
-                .jsonPath("$.saldo").isEqualTo(1000);
+                .jsonPath("$.saldo").isEqualTo(900);
     }
 
     @Test
+    @Order(3)
     void testDetalle2() {
         // When
         client.get().uri("/api/cuentas/2").exchange()
@@ -103,7 +106,7 @@ class CuentaControllerWebTestClientTest {
                 .consumeWith(response -> {
                     Cuenta cuenta = response.getResponseBody();
                     assertEquals("Rubí", cuenta.getPersona());
-                    assertEquals("2000.00", cuenta.getSaldo().toPlainString());
+                    assertEquals("2100.00", cuenta.getSaldo().toPlainString());
                 });
     }
 }
