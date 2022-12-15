@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.srosales.test.springboot.app.models.Cuenta;
 import org.srosales.test.springboot.app.models.TransaccionDto;
 
 import java.io.IOException;
@@ -56,6 +57,7 @@ class CuentaControllerWebTestClientTest {
                 .exchange()//Intercambio de la solicitud y la respuesta
         // Then
                 .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .consumeWith(resp -> {
                     try {
@@ -76,5 +78,32 @@ class CuentaControllerWebTestClientTest {
                 .jsonPath("$.transaccion.cuentaOrigenId").isEqualTo(dto.getCuentaOrigenId())
                 .jsonPath("$.date").isEqualTo(LocalDate.now().toString())
                 .json(objectMapper.writeValueAsString(response));
+    }
+
+    @Test
+    void testDetalle() {
+        // When
+        client.get().uri("/api/cuentas/1").exchange()
+        // Then
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.persona").isEqualTo("Sharon")
+                .jsonPath("$.saldo").isEqualTo(1000);
+    }
+
+    @Test
+    void testDetalle2() {
+        // When
+        client.get().uri("/api/cuentas/2").exchange()
+                // Then
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(Cuenta.class)
+                .consumeWith(response -> {
+                    Cuenta cuenta = response.getResponseBody();
+                    assertEquals("Rubí", cuenta.getPersona());
+                    assertEquals("2000.00", cuenta.getSaldo().toPlainString());
+                });
     }
 }
