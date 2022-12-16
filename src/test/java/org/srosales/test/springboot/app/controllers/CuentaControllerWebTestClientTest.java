@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
@@ -110,5 +111,49 @@ class CuentaControllerWebTestClientTest {
                     assertEquals("Rubí", cuenta.getPersona());
                     assertEquals("2100.00", cuenta.getSaldo().toPlainString());
                 });
+    }
+
+    @Test
+    @Order(4)
+    void testListar() {
+        // When
+        client.get().uri("/api/cuentas").exchange()
+        // Then
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$[0].persona").isEqualTo("Sharon")
+                .jsonPath("$[0].id").isEqualTo(1)
+                .jsonPath("$[0].saldo").isEqualTo(900)
+                .jsonPath("$[1].persona").isEqualTo("Rubí")
+                .jsonPath("$[1].id").isEqualTo(2)
+                .jsonPath("$[1].saldo").isEqualTo(2100)
+                .jsonPath("$").isArray()
+                .jsonPath("$").value(hasSize(2));
+    }
+
+    @Test
+    @Order(5)
+    void testListar2() {
+        // When
+        client.get().uri("/api/cuentas").exchange()
+                // Then
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(Cuenta.class)
+                .consumeWith(response -> {
+                    List<Cuenta> cuentas = response.getResponseBody();
+                    assertNotNull(cuentas);
+                    assertEquals(2, cuentas.size());
+                    assertEquals(1L, cuentas.get(0).getId());
+                    assertEquals("Sharon", cuentas.get(0).getPersona());
+                    assertEquals(900, cuentas.get(0).getSaldo().intValue());
+                    assertEquals(2L, cuentas.get(1).getId());
+                    assertEquals("Rubí", cuentas.get(1).getPersona());
+                    assertEquals(2100, cuentas.get(1).getSaldo().intValue());
+                })
+                // Otras formas de validar el tamaño de la respuesta
+                .hasSize(2)
+                .value(hasSize(2));
     }
 }
