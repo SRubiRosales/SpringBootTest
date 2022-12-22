@@ -1,5 +1,7 @@
 package org.srosales.test.springboot.app.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.srosales.test.springboot.app.models.TransaccionDto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +37,7 @@ class CuentaControllerTestRestTemplateTest {
 
     @Test
     @Order(1)
-    void testTransferir() {
+    void testTransferir() throws JsonProcessingException {
         // Given
         TransaccionDto dto = new TransaccionDto();
         dto.setMonto(new BigDecimal("100"));
@@ -52,6 +57,20 @@ class CuentaControllerTestRestTemplateTest {
         assertNotNull(json);
         assertTrue(json.contains("Transferencia realizada con éxito"));
         assertTrue(json.contains("{\"cuentaOrigenId\":1,\"cuentaDestinoId\":2,\"monto\":100,\"bancoId\":1}"));
+
+        JsonNode jsonNode = objectMapper.readTree(json);
+        assertEquals("Transferencia realizada con éxito", jsonNode.path("mensaje").asText());
+        assertEquals(LocalDate.now().toString(), jsonNode.path("date").asText());
+        assertEquals("100", jsonNode.path("transaccion").path("monto").asText());
+        assertEquals(1L, jsonNode.path("transaccion").path("cuentaOrigenId").asLong());
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("date", LocalDate.now().toString());
+        responseMap.put("status", "OK");
+        responseMap.put("mensaje", "Transferencia realizada con éxito");
+        responseMap.put("transaccion", dto);
+
+        assertEquals(objectMapper.writeValueAsString(responseMap), json);
     }
 
     private String crearUri(String uri) {
