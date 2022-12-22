@@ -11,6 +11,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.srosales.test.springboot.app.models.Cuenta;
 import org.srosales.test.springboot.app.models.TransaccionDto;
 
 import java.math.BigDecimal;
@@ -71,6 +72,19 @@ class CuentaControllerTestRestTemplateTest {
         responseMap.put("transaccion", dto);
 
         assertEquals(objectMapper.writeValueAsString(responseMap), json);
+    }
+
+    @Test
+    @Order(2)
+    void testDetalle() {
+        ResponseEntity<Cuenta> response = client.getForEntity(crearUri("/api/cuentas/1"), Cuenta.class);
+        Cuenta cuenta = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+        assertNotNull(cuenta);
+        assertEquals("Sharon", cuenta.getPersona());
+        assertEquals("900.00", cuenta.getSaldo().toPlainString());
+        assertEquals(new Cuenta(1L, "Sharon", new BigDecimal("900.00")), cuenta);
     }
 
     private String crearUri(String uri) {
