@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -128,6 +129,31 @@ class CuentaControllerTestRestTemplateTest {
         assertEquals(3L, cuentaNueva.getId());
         assertEquals("Pepa", cuentaNueva.getPersona());
         assertEquals("3800", cuentaNueva.getSaldo().toPlainString());
+    }
+
+    @Test
+    @Order(5)
+    void testEliminar() {
+        // 3 cuentas antes de eliminar
+        ResponseEntity<Cuenta[]> response = client.getForEntity(crearUri("/api/cuentas"), Cuenta[].class);
+        List<Cuenta> cuentas = Arrays.asList(response.getBody());
+        assertEquals(3, cuentas.size());
+
+//        client.delete(crearUri("/api/cuentas/3"));
+        Map<String, Long> pathVariables = new HashMap<>();
+        pathVariables.put("id", 3L);
+        ResponseEntity<Void> exchange = client.exchange(crearUri("/api/cuentas/{id}"), HttpMethod.DELETE, null, Void.class, pathVariables);
+        assertEquals(HttpStatus.NO_CONTENT, exchange.getStatusCode());
+        assertFalse(exchange.hasBody());
+
+        // 2 cuentas antes de eliminar
+        response = client.getForEntity(crearUri("/api/cuentas"), Cuenta[].class);
+        cuentas = Arrays.asList(response.getBody());
+        assertEquals(2, cuentas.size());
+
+        ResponseEntity<Cuenta> responseDetalle = client.getForEntity(crearUri("/api/cuentas/3"), Cuenta.class);
+        assertEquals(HttpStatus.NOT_FOUND, responseDetalle.getStatusCode());
+        assertFalse(responseDetalle.hasBody());
     }
 
     private String crearUri(String uri) {
